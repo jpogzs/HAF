@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>HAF</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    
+<h1 class="page-title">Hipster Assigned Files</h1>
+<div class="page-subtitle">RTM and Being Measured</div>
+
+    <link rel="stylesheet" href="\\bog-share01\production\SME\HAF\src\style.css">
+    <script src="\\bog-share01\production\SME\HAF\src\pogiscript.js"></script>
+
+<div class="search-wrapper">
+    <input class="form-control" id="myInput" type="text" placeholder="Search.." value="">
+</div>
+
+<div id="columnControls" style="margin-bottom:8px;">
+</div>
+
+
+<div class="table-round">
+    <table class="sortable" id="myTable">
+
+            <thead>
+                <tr>
+<!--                     <th> Order Type</th> -->
+                    <th id="fileCount"> Report IDs </th>
+                    <th> State </th>
+                    <th> Username </th>
+                    <th> Tech ID </th>
+                    <th> Team </th>
+                    <th> Location </th>
+<!--                     <th> Product </th> -->
+                    <th> Measurement Item </th>
+                    <th> Elapsed Time (h:m:s) </th>
+                    <th> Due In (h:m:s) </th>
+                </tr>
+            </thead>
+            <tbody id="data">
+            </tbody>
+        </table>
+    </div>
+    <div id="reloadTimerContainer">
+        <label>
+            <input type="checkbox" id="enableAutoReload" checked>
+        </label>
+        <div id="reloadTimer">Loading...</div>
+    </div>
+
+</body>
+
+</html>
