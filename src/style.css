@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@100..1000&display=swap');
+
 /* ===============================
    GLOBAL STYLES
 =============================== */
 body {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Sofia Sans', sans-serif;
 }
 
 /* Hide auto-reload checkbox until timer starts */
@@ -17,7 +19,7 @@ h1 {
   font-size: 20px;       /* was 28px */
   font-weight: bold;
   text-align: center;
-  color: #333;
+  color: #000;            /* added — darker font color for better readability */
   margin-top: 20px;
 }
 
@@ -43,17 +45,19 @@ h1 {
    TABLE STYLES
 =============================== */
 #myTable {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Sofia Sans', sans-serif;
   font-size: 14px;        /* added — smaller table text */
   border-collapse: collapse;
   width: 90%;
   margin: 30px auto;
+
 }
 
 #myTable th,
 #myTable td {
   border: 1px solid #ddd;
   padding: 6px;           /* slightly smaller padding */
+
 }
 
 /* Hover row effect */
@@ -89,9 +93,7 @@ td, th {
 /* ===============================
    COLUMN ALIGNMENTS RIGHT
 =============================== */
-#myTable td:nth-child(4),
-#myTable td:nth-child(8),
-#myTable td:nth-child(9) {
+#myTable td:nth-child(4) {
   text-align: right !important;
 }
 
@@ -146,6 +148,7 @@ td, th {
 .checkbox-container {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-bottom: 5px;
 }
 
@@ -166,7 +169,7 @@ td, th {
     color: #fff;
     padding: 2px 4px;       /* smaller padding */
     border-radius: 3px;     /* smaller radius */
-    font-size: 9px;         /* smaller text */
+    font-size: 11px;         /* smaller text */
     opacity: 0.85;
     z-index: 9999;
     display: flex;
