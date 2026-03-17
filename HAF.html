@@ -1,61 +1,153 @@
+<!--
+  ============================================================================
+  POGI SCRIPTS — HAF Combined (Measure + QC)
+  Markup: HAF.html
+
+  Do not edit the code without informing James Pogio
+  Contact: james.pogio@eagleview.com
+  ============================================================================
+-->
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>HAF</title>
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HAF</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="src/HAF.css">
 </head>
-
 <body>
-    
-<h1 class="page-title">Hipster Assigned Files</h1>
-<div class="page-subtitle">RTM and Being Measured</div>
 
-    <link rel="stylesheet" href="src/style.css">
-    <script src="src/pogiscript.js"></script>
-
-<div class="search-wrapper">
-    <input class="form-control" id="myInput" type="text" placeholder="Search.." value="">
-</div>
-
-<input type="hidden" id="defaultFilter" value="">
-
-<div id="columnControls" style="margin-bottom:8px;">
-</div>
-
-
-<div class="table-round">
-    <table class="sortable" id="myTable">
-
-            <thead>
-                <tr>
-<!--                     <th> Order Type</th> -->
-                    <th id="fileCount"> Report IDs </th>
-                    <th> State </th>
-                    <th> Username </th>
-                    <th> Tech ID </th>
-                    <th> Team </th>
-                    <th> Location </th>
-<!--                     <th> Product </th> -->
-                    <th> Measurement Item </th>
-                    <th> Elapsed Time (h:m:s) </th>
-                    <th> Due In (h:m:s) </th>
-                </tr>
-            </thead>
-            <tbody id="data">
-            </tbody>
-        </table>
+  <!-- ===== TAB BAR ===== -->
+  <div class="haf-tab-bar">
+    <div class="tab-logo-block">
+      <div class="haf-logo-dot"></div>
+      <span class="tab-logo-text">HAF</span>
     </div>
-    <div id="reloadTimerContainer">
-        <label>
-            <input type="checkbox" id="enableAutoReload" checked>
-        </label>
-        <div id="reloadTimer">Loading...</div>
-    </div>
+    <button class="tab-btn tab-active" id="tab-measure-btn" onclick="switchTab('measure')">
+      Measure
+    </button>
+    <button class="tab-btn" id="tab-qc-btn" onclick="switchTab('qc')">
+      QC
+    </button>
+    <div class="tab-spacer"></div>
+    <button id="themeToggle" title="Switch theme">
+      <span id="themeIcon">☀️</span>
+      <span id="themeLabel">Light</span>
+    </button>
+  </div>
 
+
+  <!-- ================================================================
+       MEASURE PANEL
+  ================================================================ -->
+  <div class="tab-panel panel-active" id="panel-measure">
+    <header class="haf-header">
+      <div>
+        <div class="haf-title">Hipster Assigned Files — Measure</div>
+        <div class="haf-subtitle">RTM &amp; Being Measured</div>
+      </div>
+      <div class="haf-stats">
+        <span class="stat-pill live" id="m-statLive">Live: —</span>
+        <span class="stat-pill late" id="m-statLate">Late: —</span>
+        <span class="stat-pill"     id="m-statTotal">Total: —</span>
+      </div>
+    </header>
+    <div class="controls-bar">
+      <input class="tab-search" id="m-myInput" type="text" placeholder="Search…" autocomplete="off">
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">Show</span>
+      <div class="type-controls">
+        <button class="toggle-btn" id="m-chkLive"     data-key="m-chkLiveState"     data-active="active-live">Live</button>
+        <button class="toggle-btn" id="m-chkTraining" data-key="m-chkTrainingState" data-active="active-training">Training</button>
+      </div>
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">Columns</span>
+      <div class="col-controls" id="m-columnControls"></div>
+    </div>
+    <input type="hidden" id="m-defaultFilter" value="Bogota">
+    <div class="table-round">
+      <table class="haf-table sortable" id="measure-table">
+        <thead><tr>
+          <th>Order Type</th>
+          <th id="m-fileCount">Reports</th>
+          <th>State</th>
+          <th>History</th>
+          <th>Username</th>
+          <th>Tech ID</th>
+          <th>Team</th>
+          <th>Location</th>
+          <th>Measurement Item</th>
+          <th>Elapsed Time</th>
+          <th>Due In</th>
+        </tr></thead>
+        <tbody id="m-data"></tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ================================================================
+       QC PANEL
+  ================================================================ -->
+  <div class="tab-panel" id="panel-qc">
+    <header class="haf-header">
+      <div>
+        <div class="haf-title">Hipster Assigned Files — QC</div>
+        <div class="haf-subtitle">RFQC &amp; Being QCed</div>
+      </div>
+      <div class="haf-stats">
+        <span class="stat-pill live" id="q-statLive">Live: —</span>
+        <span class="stat-pill late" id="q-statLate">Late: —</span>
+        <span class="stat-pill"     id="q-statTotal">Total: —</span>
+      </div>
+    </header>
+    <div class="controls-bar">
+      <input class="tab-search" id="q-myInput" type="text" placeholder="Search…" autocomplete="off">
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">Show</span>
+      <div class="type-controls">
+        <button class="toggle-btn" id="q-chkLive"     data-key="q-chkLiveState"     data-active="active-live">Live</button>
+        <button class="toggle-btn" id="q-chkTraining" data-key="q-chkTrainingState" data-active="active-training">Training</button>
+      </div>
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">Columns</span>
+      <div class="col-controls" id="q-columnControls"></div>
+    </div>
+    <input type="hidden" id="q-defaultFilter" value="BOG">
+    <div class="table-round">
+      <table class="haf-table sortable" id="qc-table">
+        <thead><tr>
+          <th>Order Type</th>
+          <th id="q-fileCount">Reports</th>
+          <th>State</th>
+          <th>Tech</th>
+          <th>QC</th>
+          <th>QC ID</th>
+          <th>Team</th>
+          <th>Location</th>
+          <th>Measurement Item</th>
+          <th>Elapsed Time</th>
+          <th>Due In</th>
+        </tr></thead>
+        <tbody id="q-data"></tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ===== FOOTER ===== -->
+  <div id="reloadTimerContainer">
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+      <input type="checkbox" id="enableAutoReload" checked>
+      <span style="color:var(--text-muted)">Auto-reload</span>
+    </label>
+    <span style="color:var(--border-light)">|</span>
+    <div id="reloadTimer">Loading…</div>
+  </div>
+
+  <script src="src/HAF.js"></script>
 </body>
-
 </html>
