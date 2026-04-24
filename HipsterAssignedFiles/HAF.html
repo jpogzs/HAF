@@ -140,12 +140,15 @@
 
   <!-- ===== FOOTER ===== -->
   <div id="reloadTimerContainer">
-    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
-      <input type="checkbox" id="enableAutoReload" checked>
-      <span style="color:var(--text-muted)">Auto-reload</span>
-    </label>
-    <span style="color:var(--border-light)">|</span>
-    <div id="reloadTimer">Loading…</div>
+    <div class="center-group">
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+        <input type="checkbox" id="enableAutoReload" checked>
+        <span style="color:var(--text-muted)">Auto-reload</span>
+      </label>
+      <span style="color:var(--border-light)">|</span>
+      <div id="reloadTimer">Loading…</div>
+    </div>
+    <span class="version">v26.4.23</span>
   </div>
 
   <script src="src/HAF.js"></script>
