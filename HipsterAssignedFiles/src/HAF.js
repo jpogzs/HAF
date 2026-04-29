@@ -397,7 +397,10 @@ let m_pendingFetches=0, m_fileCount=0;
           .then(r=>r.ok?r.json():Promise.reject())
           .then(report=>{
             const pmText=report.pmReportID?' [PM]':'';
-            return fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskState/id/${item.taskStateID}`)
+            const taskTrafficPromise = fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskTrafficView/report/${item.reportID}`)
+              .then(r=>r.ok?r.json():Promise.reject())
+              .catch(() => ({}));
+            return taskTrafficPromise.then(taskTraffic => fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskState/id/${item.taskStateID}`)
               .then(r=>r.ok?r.json():Promise.reject())
               .then(task=>fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskState/${task.taskID}`)
                 .then(r=>r.ok?r.json():Promise.reject())
@@ -407,27 +410,27 @@ let m_pendingFetches=0, m_fileCount=0;
                   const sorted=entries.filter(e=>e.description&&e.description.includes('Rejected')&&firstRTM&&new Date(e.stateTime)>new Date(firstRTM.stateTime)).sort((a,b)=>new Date(a.stateTime)-new Date(b.stateTime));
                   const rejectedCounts=new Map();
                   sorted.forEach(e=>{const match=e.description.match(/Rejected\(([^)]+)\)/);if(match){const t=match[1];rejectedCounts.set(t,(rejectedCounts.get(t)||0)+1);}});
-                  return{report,pmText,task,rejectedCounts};
-                }));
+                  return{report,pmText,task,rejectedCounts,taskTraffic};
+                })));
           })
-          .then(({report,pmText,task,rejectedCounts})=>{
+          .then(({report,pmText,task,rejectedCounts,taskTraffic})=>{
             const userID=isRTM?task.preferredUserID:task.userID;
             return fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/User/id?ids=${userID}`)
-              .then(r=>r.ok?r.json():Promise.reject()).then(user=>({report,pmText,task,rejectedCounts,user}));
+              .then(r=>r.ok?r.json():Promise.reject()).then(user=>({report,pmText,task,rejectedCounts,taskTraffic,user}));
           })
-          .then(({report,pmText,task,rejectedCounts,user})=>
+          .then(({report,pmText,task,rejectedCounts,taskTraffic,user})=>
             fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/Report/${item.reportID}/measurement-items`)
-              .then(r=>r.ok?r.json():Promise.reject()).then(mItems=>({report,pmText,task,rejectedCounts,user,mItems})))
-          .then(({report,pmText,task,rejectedCounts,user,mItems})=>{
+              .then(r=>r.ok?r.json():Promise.reject()).then(mItems=>({report,pmText,task,rejectedCounts,taskTraffic,user,mItems})))
+          .then(({report,pmText,task,rejectedCounts,taskTraffic,user,mItems})=>{
             const locationName=dictLocation.get(user[0]?.locationId)??'';
             const hasReworkHistory=[...rejectedCounts.keys()].some(type=>/rework/i.test(type));
             if (!hasReworkHistory) {
-              return {report,pmText,task,rejectedCounts,user,mItems,reworkDetails:'',locationName};
+              return {report,pmText,task,rejectedCounts,taskTraffic,user,mItems,reworkDetails:'',locationName};
             }
             return fetchMeasureReworkDetails(item.reportID,locationName)
-              .then(reworkDetails=>({report,pmText,task,rejectedCounts,user,mItems,reworkDetails,locationName}));
+              .then(reworkDetails=>({report,pmText,task,rejectedCounts,taskTraffic,user,mItems,reworkDetails,locationName}));
           })
-          .then(({report,pmText,task,rejectedCounts,user,mItems,reworkDetails,locationName})=>{
+          .then(({report,pmText,task,rejectedCounts,taskTraffic,user,mItems,reworkDetails,locationName})=>{
             const mText=(mItems.measurementItems||[]).map(m=>'*'+(m.name||'').replace(/\s+/g,'')).join('  ');
             const rejectedSuffix=[...rejectedCounts.entries()].map(([type,count])=>`<span style="color:${count>1?'red':isRTM?'var(--text-primary)':'var(--text-secondary)'};">${type} ${count}x</span>`).join('<br>');
             const reworkHtml=escapeHtml(reworkDetails).replace(/\n/g,'<br>');
@@ -440,6 +443,7 @@ let m_pendingFetches=0, m_fileCount=0;
 <td style="color:${isRTM?'var(--text-primary)':'var(--text-secondary)'};">${reworkHtml}</td>
 <td>${user[0]?.techUsername??''}</td>
 <td>${dictTeam.get(user[0]?.teamId)??''}</td><td>${locationName}</td>
+<td>${taskTraffic?.primaryProductName??''}</td>
 <td>${mText}${pmText}</td>`;
             const stateTime=new Date(task.stateTime),minutes=(ocTime-stateTime)/60000;
             const h=String(Math.abs(Math.floor(minutes/60))).padStart(2,'0');
@@ -458,12 +462,12 @@ let m_pendingFetches=0, m_fileCount=0;
             applyAllFilters('m');
             initColumnVisibility('measure-table','hiddenCols_measure','m-columnControls');
             m_pendingFetches--;
-            if(m_pendingFetches===0){sortTableByColumn('measure-table',11,true);colorDuplicateMeasureUsernames();startDynamicTimers('m-data');if(!reloadTimerStarted)startReloadTimer();}
+            if(m_pendingFetches===0){sortTableByColumn('measure-table',12,true);colorDuplicateMeasureUsernames();startDynamicTimers('m-data');if(!reloadTimerStarted)startReloadTimer();}
           })
           .catch(err=>{
             console.error('measure report chain error:',err);
             m_pendingFetches=Math.max(0,m_pendingFetches-1);
-            if(m_pendingFetches===0){sortTableByColumn('measure-table',11,true);colorDuplicateMeasureUsernames();startDynamicTimers('m-data');if(!reloadTimerStarted)startReloadTimer();}
+            if(m_pendingFetches===0){sortTableByColumn('measure-table',12,true);colorDuplicateMeasureUsernames();startDynamicTimers('m-data');if(!reloadTimerStarted)startReloadTimer();}
           });
       });
     }
@@ -536,7 +540,10 @@ let q_pendingFetches=0, q_fileCount=0;
           .then(r=>r.ok?r.json():Promise.reject())
           .then(report=>{
             const pmText=report.pmReportID?' [PM]':'';
-            return fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskState/id/${item.taskStateID}`)
+            const taskTrafficPromise = fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskTrafficView/report/${item.reportID}`)
+              .then(r=>r.ok?r.json():Promise.reject())
+              .catch(() => ({}));
+            return taskTrafficPromise.then(taskTraffic => fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskState/id/${item.taskStateID}`)
               .then(r=>r.ok?r.json():Promise.reject())
               .then(task=>fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskState/report/${item.reportID}`)
                 .then(r=>r.ok?r.json():Promise.reject())
@@ -547,20 +554,20 @@ let q_pendingFetches=0, q_fileCount=0;
                   }
                   return fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/TaskState/${task.taskID}`)
                     .then(r=>r.ok?r.json():Promise.reject())
-                    .then(task2=>({report,pmText,task,isRework:JSON.stringify(task2).includes('Rework')}));
-                }));
+                    .then(task2=>({report,pmText,task,isRework:JSON.stringify(task2).includes('Rework'),taskTraffic}));
+                })));
           })
-          .then(({report,pmText,task,isRework})=>{
+          .then(({report,pmText,task,isRework,taskTraffic})=>{
             const userID=isRFQC?task.preferredUserID:task.userID;
             const userPromise=userID
               ?fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/User/id?ids=${userID}`).then(r=>r.ok?r.json():Promise.reject())
               :Promise.resolve([{userName:null,techUsername:null,teamId:null,locationId:null}]);
-            return userPromise.then(user=>({report,pmText,task,isRework,user}));
+            return userPromise.then(user=>({report,pmText,task,isRework,taskTraffic,user}));
           })
-          .then(({report,pmText,task,isRework,user})=>
+          .then(({report,pmText,task,isRework,taskTraffic,user})=>
             fetch(`https://api.cmh.platform-prod2.evinternal.net/operations-center/api/Report/${item.reportID}/measurement-items`)
-              .then(r=>r.ok?r.json():Promise.reject()).then(mItems=>({report,pmText,task,isRework,user,mItems})))
-          .then(({report,pmText,task,isRework,user,mItems})=>{
+              .then(r=>r.ok?r.json():Promise.reject()).then(mItems=>({report,pmText,task,isRework,taskTraffic,user,mItems})))
+          .then(({report,pmText,task,isRework,taskTraffic,user,mItems})=>{
             const mText=(mItems.measurementItems||[]).map(m=>'*'+(m.name||'').replace(/\s+/g,'')).join('  ');
             const typeBadge=isTraining?'<span class="badge-training">Training</span>':'<span class="badge-live">Live</span>';
             const stateLabel=isRFQC?`Ready For QC${isRework?' (Rework)':''}`:`Being Qced${isRework?' (Rework)':''}`;
@@ -571,6 +578,7 @@ let q_pendingFetches=0, q_fileCount=0;
 <td>${lastMeasured&&lastMeasured.description?(lastMeasured.description.match(/\(([^)]+)\)/)||[])[1]||'':''}</td>
 <td>${user[0]?.userName??''}</td><td>${user[0]?.techUsername??''}</td>
 <td>${dictTeam.get(user[0]?.teamId)??''}</td><td>${dictLocation.get(user[0]?.locationId)??''}</td>
+<td>${taskTraffic?.primaryProductName??''}</td>
 <td>${mText}${pmText}</td>`;
             const stateTime=new Date(task.stateTime),minutes=(ocTime-stateTime)/60000;
             const h=String(Math.abs(Math.floor(minutes/60))).padStart(2,'0');
@@ -589,12 +597,12 @@ let q_pendingFetches=0, q_fileCount=0;
             applyAllFilters('q');
             initColumnVisibility('qc-table','hiddenCols_qc','q-columnControls');
             q_pendingFetches--;
-            if(q_pendingFetches===0){sortTableByColumn('qc-table',10,true);startDynamicTimers('q-data');if(!reloadTimerStarted)startReloadTimer();}
+            if(q_pendingFetches===0){sortTableByColumn('qc-table',11,true);startDynamicTimers('q-data');if(!reloadTimerStarted)startReloadTimer();}
           })
           .catch(err=>{
             console.error('qc report chain error:',err);
             q_pendingFetches=Math.max(0,q_pendingFetches-1);
-            if(q_pendingFetches===0){sortTableByColumn('qc-table',10,true);startDynamicTimers('q-data');if(!reloadTimerStarted)startReloadTimer();}
+            if(q_pendingFetches===0){sortTableByColumn('qc-table',11,true);startDynamicTimers('q-data');if(!reloadTimerStarted)startReloadTimer();}
           });
       });
     }

@@ -260,26 +260,26 @@ body::before {
 
 /* Measure column alignment */
 #measure-table td:nth-child(3),#measure-table td:nth-child(4),#measure-table td:nth-child(5),
-#measure-table td:nth-child(6),#measure-table td:nth-child(8),#measure-table td:nth-child(9),#measure-table td:nth-child(10)
+#measure-table td:nth-child(6),#measure-table td:nth-child(8),#measure-table td:nth-child(9),#measure-table td:nth-child(10),#measure-table td:nth-child(11)
   { text-align:left; font-family:var(--sans); font-size:13px; }
 #measure-table thead th:nth-child(3),#measure-table thead th:nth-child(4),#measure-table thead th:nth-child(5),
-#measure-table thead th:nth-child(6),#measure-table thead th:nth-child(8),#measure-table thead th:nth-child(9),#measure-table thead th:nth-child(10)
+#measure-table thead th:nth-child(6),#measure-table thead th:nth-child(8),#measure-table thead th:nth-child(9),#measure-table thead th:nth-child(10),#measure-table thead th:nth-child(11)
   { text-align:left; }
 #measure-table thead th:nth-child(7),#measure-table td:nth-child(7) { text-align:center; }
 #measure-table td:nth-child(2) { font-size:13px; }
 #measure-table td:nth-child(5),#measure-table td:nth-child(6),#measure-table td:nth-child(7),
-#measure-table td:nth-child(9),#measure-table td:nth-child(10) { color:var(--text-secondary); }
+#measure-table td:nth-child(9),#measure-table td:nth-child(10),#measure-table td:nth-child(11) { color:var(--text-secondary); }
 
 /* QC column alignment */
 #qc-table td:nth-child(3),#qc-table td:nth-child(4),#qc-table td:nth-child(5),
-#qc-table td:nth-child(7),#qc-table td:nth-child(8),#qc-table td:nth-child(9)
+#qc-table td:nth-child(7),#qc-table td:nth-child(8),#qc-table td:nth-child(9),#qc-table td:nth-child(10)
   { text-align:left; font-family:var(--sans); font-size:13px; }
 #qc-table thead th:nth-child(3),#qc-table thead th:nth-child(4),#qc-table thead th:nth-child(5),
-#qc-table thead th:nth-child(7),#qc-table thead th:nth-child(8),#qc-table thead th:nth-child(9)
+#qc-table thead th:nth-child(7),#qc-table thead th:nth-child(8),#qc-table thead th:nth-child(9),#qc-table thead th:nth-child(10)
   { text-align:left; }
 #qc-table td:nth-child(2) { font-size:13px; }
 #qc-table td:nth-child(1),#qc-table td:nth-child(6),
-#qc-table td:nth-child(8),#qc-table td:nth-child(9) { color:var(--text-secondary); }
+#qc-table td:nth-child(8),#qc-table td:nth-child(9),#qc-table td:nth-child(10) { color:var(--text-secondary); }
 
 /* ── BADGES ── */
 .badge-live {
